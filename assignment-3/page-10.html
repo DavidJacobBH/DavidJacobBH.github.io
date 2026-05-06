@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="p10" data-stop="8">
+
+  <main class="gallery">
+    <img src="images/upstairs-common-01.jpg" alt="">
+    <img src="images/upstairs-common-02.jpg" alt="">
+    <img src="images/upstairs-painting-01.jpg" alt="">
+  </main>
+
+  <nav class="dots">
+    <a href="page-01.html" title="The Outside"></a>
+    <a href="page-03.html" title="The Entrance"></a>
+    <a href="page-04.html" title="The Fireplace Room"></a>
+    <a href="page-09.html" title="Common Room"></a>
+    <a href="page-12.html" title="The Lounge"></a>
+    <a href="page-07.html" title="The Staircase"></a>
+    <a href="page-08.html" title="Upstairs"></a>
+    <a href="page-10.html" title="Upstairs Common" class="active"></a>
+    <a href="page-11.html" title="The Gallery"></a>
+    <a href="page-05.html" title="Coffee Club Lounge"></a>
+    <a href="page-06.html" title="Coffee Club"></a>
+    <a href="page-02.html" title="The Grounds"></a>
+  </nav>
+
+  <a href="page-08.html" class="prev">&#8592;</a>
+  <a href="page-11.html" class="next">&#8594;</a>
+
+  <div class="player">
+    <div class="track">
+      <span class="name">Campus Lounge</span>
+      <span class="sub">Ambient &bull; Princeton NJ</span>
+    </div>
+    <div class="controls">
+      <button class="play" id="play">&#9654;</button>
+      <div class="bars" id="bars">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="vol">
+      <label for="vol">VOL</label>
+      <input type="range" id="vol" min="0" max="100" value="60">
+    </div>
+  </div>
+
+  <audio id="audio" loop src="https://upload.wikimedia.org/wikipedia/commons/1/10/Ambient_classroom_mono.ogg"></audio>
+
+  <script src="main.js"></script>
+
+</body>
+</html>

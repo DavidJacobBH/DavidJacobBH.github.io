@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffee Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="p5">
+
+  <main class="gallery">
+    <img src="images/basement-stairs-01.jpg" alt="">
+    <img src="images/basement-stairs-02.jpg" alt="">
+    <img src="images/coffee-shop-01.jpg" alt="">
+    <img src="images/coffee-shop-02.jpg" alt="">
+    <img src="images/coffee-shop-03.jpg" alt="">
+    <img src="images/coffee-shop-04.jpg" alt="">
+  </main>
+
+  <nav class="nav-dots">
+    <a href="page-01.html"></a>
+    <a href="page-02.html"></a>
+    <a href="page-03.html"></a>
+    <a href="page-04.html"></a>
+    <a href="page-05.html" class="active"></a>
+    <a href="page-06.html"></a>
+    <a href="page-07.html"></a>
+    <a href="page-08.html"></a>
+    <a href="page-09.html"></a>
+    <a href="page-10.html"></a>
+  </nav>
+
+  <a href="page-04.html" class="nav-prev">&#8592;</a>
+  <a href="page-06.html" class="nav-next">&#8594;</a>
+
+  <script>
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  location.href = 'page-04.html';
+      if (e.key === 'ArrowRight') location.href = 'page-06.html';
+    });
+  </script>
+
+</body>
+</html>

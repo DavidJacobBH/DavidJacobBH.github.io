@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Club</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <style>
+    #welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      cursor: pointer;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+    #welcome-overlay.fade-out { opacity: 0; pointer-events: none; }
+
+    #welcome-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      color: #fff;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s 0.2s ease, transform 0.7s 0.2s ease;
+    }
+    #welcome-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.7s 0.5s ease, transform 0.7s 0.5s ease;
+    }
+    #welcome-overlay.ready #welcome-title,
+    #welcome-overlay.ready #welcome-sub {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="p1" data-stop="1">
+
+  <div id="welcome-overlay">
+    <div id="welcome-title">Welcome to Campus Club</div>
+    <div id="welcome-sub">Use up and down arrows to navigate</div>
+  </div>
+  <script>
+    (function () {
+      var overlay = document.getElementById('welcome-overlay');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { overlay.classList.add('ready'); });
+      });
+      function dismiss() {
+        overlay.classList.add('fade-out');
+        overlay.addEventListener('transitionend', function () { overlay.remove(); }, { once: true });
+      }
+      overlay.addEventListener('click', dismiss);
+      document.addEventListener('keydown', dismiss, { once: true });
+    }());
+  </script>
+
+  <main class="gallery">
+    <img src="images/exterior-01.jpg" alt="">
+    <img src="images/exterior-02.jpg" alt="">
+    <img src="images/exterior-03.jpg" alt="">
+    <img src="images/exterior-04.jpg" alt="">
+    <img src="images/exterior-05.jpg" alt="">
+    <img src="images/exterior-06.jpg" alt="">
+    <img src="images/exterior-07.jpg" alt="">
+    <img src="images/exterior-08.jpg" alt="">
+    <img src="images/exterior-09.jpg" alt="">
+    <img src="images/exterior-10.jpg" alt="">
+    <img src="images/exterior-11.jpg" alt="">
+    <img src="images/exterior-12.jpg" alt="">
+    <img src="images/exterior-13.jpg" alt="">
+    <img src="images/exterior-14.jpg" alt="">
+    <img src="images/exterior-15.jpg" alt="">
+  </main>
+
+  <nav class="dots">
+    <a href="page-01.html" title="The Outside" class="active"></a>
+    <a href="page-03.html" title="The Entrance"></a>
+    <a href="page-04.html" title="The Fireplace Room"></a>
+    <a href="page-09.html" title="Common Room"></a>
+    <a href="page-12.html" title="The Lounge"></a>
+    <a href="page-07.html" title="The Staircase"></a>
+    <a href="page-08.html" title="Upstairs"></a>
+    <a href="page-10.html" title="Upstairs Common"></a>
+    <a href="page-11.html" title="The Gallery"></a>
+    <a href="page-05.html" title="Coffee Club Lounge"></a>
+    <a href="page-06.html" title="Coffee Club"></a>
+    <a href="page-02.html" title="The Grounds"></a>
+  </nav>
+
+  <a href="page-02.html" class="prev">&#8592;</a>
+  <a href="page-03.html" class="next">&#8594;</a>
+
+  <script src="main.js"></script>
+
+</body>
+</html>

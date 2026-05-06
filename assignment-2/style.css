@@ -1,0 +1,160 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: #0c0c0c;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body { animation: fadeIn 0.45s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── GALLERY ── */
+.gallery {
+  display: grid;
+  gap: 3px;
+  padding: 3px;
+}
+
+.gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.3s ease;
+}
+
+.gallery img:hover {
+  filter: brightness(1.1) saturate(1.08);
+}
+
+/* ── PAGE GRID CONFIGS ── */
+
+/* Page 1: Exterior – 10 imgs, 5×2 */
+body.p1 .gallery {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+
+/* Page 2: Lawn – 5 imgs, 3-col; first image spans 2 cols */
+body.p2 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+body.p2 .gallery img:nth-child(1) { grid-column: span 2; }
+
+/* Page 3: Entrance – 3 imgs, full height */
+body.p3 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: calc(100vh - 6px);
+}
+
+/* Page 4: Fireplace Room – 4 imgs, 2×2 */
+body.p4 .gallery {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+
+/* Page 5: Basement – 6 imgs, 3×2 */
+body.p5 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+
+/* Page 6: Stairs – 3 imgs, full height */
+body.p6 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: calc(100vh - 6px);
+}
+
+/* Page 7: Landing Common Room – 7 imgs, 12-col, 4 top + 3 bottom */
+body.p7 .gallery {
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+body.p7 .gallery img:nth-child(-n+4) { grid-column: span 3; }
+body.p7 .gallery img:nth-child(n+5)  { grid-column: span 4; }
+
+/* Page 8: Bookshelf Room – 5 imgs, tall feature on left */
+body.p8 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+body.p8 .gallery img:nth-child(1) { grid-row: span 2; }
+
+/* Page 9: Upstairs Common Room – 3 imgs, full height */
+body.p9 .gallery {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: calc(100vh - 6px);
+}
+
+/* Page 10: Upstairs Gallery – 7 imgs, 12-col, 4 top + 3 bottom */
+body.p10 .gallery {
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(2, calc(50vh - 4.5px));
+}
+body.p10 .gallery img:nth-child(-n+4) { grid-column: span 3; }
+body.p10 .gallery img:nth-child(n+5)  { grid-column: span 4; }
+
+/* ── DOT NAVIGATION ── */
+.nav-dots {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+.nav-dots a {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.25s, transform 0.25s;
+}
+
+.nav-dots a:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.5);
+}
+
+.nav-dots a.active {
+  background: #ffffff;
+  transform: scale(1.4);
+}
+
+/* ── PREV / NEXT ARROWS ── */
+.nav-prev,
+.nav-next {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0);
+  font-size: 1.4rem;
+  text-decoration: none;
+  z-index: 99;
+  transition: color 0.25s, background 0.25s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.nav-prev:hover,
+.nav-next:hover {
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-prev { left: 0; }
+.nav-next { right: 42px; }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffee Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="p1">
+
+  <main class="gallery">
+    <img src="images/exterior-01.jpg" alt="">
+    <img src="images/exterior-02.jpg" alt="">
+    <img src="images/exterior-03.jpg" alt="">
+    <img src="images/exterior-04.jpg" alt="">
+    <img src="images/exterior-05.jpg" alt="">
+    <img src="images/exterior-06.jpg" alt="">
+    <img src="images/exterior-07.jpg" alt="">
+    <img src="images/exterior-08.jpg" alt="">
+    <img src="images/exterior-09.jpg" alt="">
+    <img src="images/exterior-10.jpg" alt="">
+  </main>
+
+  <nav class="nav-dots">
+    <a href="page-01.html" class="active"></a>
+    <a href="page-02.html"></a>
+    <a href="page-03.html"></a>
+    <a href="page-04.html"></a>
+    <a href="page-05.html"></a>
+    <a href="page-06.html"></a>
+    <a href="page-07.html"></a>
+    <a href="page-08.html"></a>
+    <a href="page-09.html"></a>
+    <a href="page-10.html"></a>
+  </nav>
+
+  <a href="page-10.html" class="nav-prev">&#8592;</a>
+  <a href="page-02.html" class="nav-next">&#8594;</a>
+
+  <script>
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  location.href = 'page-10.html';
+      if (e.key === 'ArrowRight') location.href = 'page-02.html';
+    });
+  </script>
+
+</body>
+</html>

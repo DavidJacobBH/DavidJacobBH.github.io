@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Coffee Club Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0c0c0c;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .menu-wrap {
+      position: relative;
+      width: min(100vw, calc(100vh * (2000 / 1499)));
+      height: min(100vh, calc(100vw * (1499 / 2000)));
+    }
+
+    .menu-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-area {
+      position: absolute;
+      display: block;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    button.map-area:hover {
+      outline: 2px solid rgba(232, 114, 26, 0.85);
+      background: rgba(232, 114, 26, 0.10);
+    }
+
+    a.map-area:hover {
+      outline: 2px solid rgba(120, 200, 255, 0.75);
+      background: rgba(80, 180, 255, 0.08);
+    }
+
+    .cart {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      border-top: 1px solid #333;
+      padding: 40px 16px 16px;
+      z-index: 100;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    .cart.open { display: block; }
+
+    .cart-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .cart-items { margin-bottom: 12px; }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid #222;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+
+    .cart-item .drink-name { flex: 1; }
+    .cart-item .drink-price { color: #555; min-width: 44px; text-align: right; }
+
+    .qty { display: flex; align-items: center; gap: 8px; }
+    .qty button {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #444;
+      background: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .qty .num { color: #aaa; min-width: 18px; text-align: center; }
+
+    .cart-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid #333;
+      gap: 16px;
+    }
+
+    .cart-total { color: #666; font-size: 0.85rem; }
+    .cart-total strong { color: #aaa; }
+
+    .cart-confirm { color: #ccc; font-size: 1.4rem; font-weight: 700; display: none; letter-spacing: 0.02em; }
+
+    .cart-order {
+      background: none;
+      color: #aaa;
+      border: 1px solid #444;
+      padding: 8px 20px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .cart-order:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── SPLASH OVERLAY ── */
+    .splash-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 2, 1, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+    .splash-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .splash-img-outer {
+      position: relative;
+      width: min(58vw, 58vh);
+      max-width: 360px;
+    }
+
+    .splash-img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.06),
+        0 0 70px rgba(160,110,60,0.22),
+        0 30px 80px rgba(0,0,0,0.7);
+      transform: scale(0.25) rotate(-8deg);
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .splash-overlay.active .splash-img-wrap {
+      transform: scale(1) rotate(0deg);
+    }
+
+    .splash-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 5s ease;
+    }
+    .splash-overlay.active .splash-img {
+      transform: scale(1.06);
+    }
+
+    /* Expanding ring ripples */
+    .splash-rings {
+      position: absolute;
+      inset: -40px;
+      pointer-events: none;
+    }
+    .splash-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      opacity: 0;
+    }
+    .splash-rings.pop .splash-ring:nth-child(1) { animation: ringPop 1.6s 0.05s ease-out forwards; }
+    .splash-rings.pop .splash-ring:nth-child(2) { animation: ringPop 1.6s 0.22s ease-out forwards; }
+    .splash-rings.pop .splash-ring:nth-child(3) { animation: ringPop 1.6s 0.40s ease-out forwards; }
+
+    @keyframes ringPop {
+      0%   { transform: scale(0.45); opacity: 0.7; }
+      100% { transform: scale(1.65); opacity: 0; }
+    }
+
+    /* Liquid-drop pulse on the image border */
+    @keyframes borderPulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(255,255,255,0.06), 0 0 70px rgba(160,110,60,0.22), 0 30px 80px rgba(0,0,0,0.7); }
+      50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0.12), 0 0 90px rgba(180,130,70,0.35), 0 30px 80px rgba(0,0,0,0.7); }
+    }
+    .splash-overlay.active .splash-img-wrap {
+      animation: borderPulse 2s 0.55s ease-in-out infinite;
+    }
+
+    .splash-drink-name {
+      color: #fff;
+      font-size: clamp(1.4rem, 5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.4s 0.28s, transform 0.4s 0.28s;
+    }
+    .splash-overlay.active .splash-drink-name {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .splash-drink-price {
+      color: #7a5a3a;
+      font-size: clamp(0.95rem, 2.8vw, 1.3rem);
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s 0.44s, transform 0.4s 0.44s;
+    }
+    .splash-overlay.active .splash-drink-price {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── BREW OVERLAY ── */
+    .brew-overlay {
+      position: fixed; inset: 0;
+      background: rgba(4,2,1,0.92);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .brew-overlay.active { opacity: 1; pointer-events: all; }
+
+    .brew-content {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 18px; text-align: center; padding: 32px 24px;
+      transform: scale(0.92);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .brew-overlay.active .brew-content { transform: scale(1); }
+
+    .brew-label {
+      color: #E8721A; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+    }
+    .brew-sub { color: #666; font-size: 0.8rem; letter-spacing: 0.06em; margin-top: -10px; }
+
+    .brew-bar-wrap {
+      position: relative; width: 300px; height: 20px;
+      background: #1a1a1a; border: 1px solid #333; border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .brew-zone {
+      position: absolute; top: 0; bottom: 0;
+      background: rgba(232,114,26,0.25);
+      border-left: 1px solid rgba(232,114,26,0.55);
+      border-right: 1px solid rgba(232,114,26,0.55);
+      transition: left 0.25s ease, width 0.25s ease;
+    }
+
+    .brew-cursor {
+      position: absolute; top: 0; bottom: 0; width: 3px;
+      background: #fff; border-radius: 1px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px rgba(255,255,255,0.6);
+      will-change: left;
+    }
+
+    .brew-btn {
+      margin-top: 6px; background: none; border: 1px solid #444;
+      color: #ccc; font-size: 0.9rem; letter-spacing: 0.1em;
+      padding: 10px 32px; cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .brew-btn:hover { border-color: #E8721A; color: #E8721A; }
+
+    .brew-feedback {
+      min-height: 1.2em; font-size: 0.82rem;
+      color: #aaa; letter-spacing: 0.04em; transition: color 0.2s;
+    }
+    .brew-feedback.success { color: #E8721A; }
+    .brew-feedback.fail    { color: #884400; }
+
+    .brew-attempts { color: #444; font-size: 0.72rem; letter-spacing: 0.08em; }
+
+    @keyframes brewShake {
+      0%, 100% { transform: scale(1); }
+      25%       { transform: scale(1.015) translateX(-3px); }
+      75%       { transform: scale(1.015) translateX(3px); }
+    }
+    .brew-content.shake { animation: brewShake 0.28s ease; }
+
+  </style>
+</head>
+<body>
+
+  <div class="menu-wrap">
+    <img src="images/coffee-shop-10.jpg" alt="The Coffee Club Menu">
+
+    <a class="map-area" href="page-06.html" style="top:8.94%;left:14%;width:64%;height:8.74%"></a>
+
+    <button class="map-area" data-drink="Coffee"        data-price="2.25" style="top:28.55%;left:11.1%;width:10.4%;height:4.8%"></button>
+    <button class="map-area" data-drink="Espresso"      data-price="3.25" style="top:35.02%;left:11.1%;width:12.4%;height:4%"></button>
+    <button class="map-area" data-drink="Macchiato"     data-price="3.25" style="top:40.69%;left:10.5%;width:14.5%;height:3.34%"></button>
+    <button class="map-area" data-drink="Cappuccino"    data-price="4.45" style="top:45.36%;left:10%;width:16%;height:4.67%"></button>
+    <button class="map-area" data-drink="Latte"         data-price="4.95" style="top:50.7%;left:10%;width:8%;height:5.34%"></button>
+    <button class="map-area" data-drink="Matcha"        data-price="5.50" style="top:57.37%;left:10%;width:11%;height:5.54%"></button>
+    <button class="map-area" data-drink="Chai Latte"    data-price="5.75" style="top:64.04%;left:10%;width:13.9%;height:6.14%"></button>
+    <button class="map-area" data-drink="Tea"           data-price="3.20" style="top:71.18%;left:10%;width:6.25%;height:5.54%"></button>
+    <button class="map-area" data-drink="Hot Chocolate" data-price="4.60" style="top:77.38%;left:10%;width:17.5%;height:6%"></button>
+    <button class="map-area" data-drink="London Fog"    data-price="4.95" style="top:84.72%;left:10%;width:15%;height:6.67%"></button>
+
+    <button class="map-area" data-drink="Cold Brew"       data-price="4.25" style="top:30.02%;left:48%;width:12.5%;height:4%"></button>
+    <button class="map-area" data-drink="Iced Latte"      data-price="4.95" style="top:37.76%;left:48%;width:12.75%;height:4.27%"></button>
+    <button class="map-area" data-drink="Iced Americano"  data-price="3.50" style="top:46.03%;left:48%;width:20.25%;height:3.67%"></button>
+    <button class="map-area" data-drink="Iced Chai Latte" data-price="5.75" style="top:53.37%;left:48%;width:18.5%;height:4%"></button>
+    <button class="map-area" data-drink="Iced Tea"        data-price="3.20" style="top:60.04%;left:48.5%;width:12.75%;height:4.67%"></button>
+  </div>
+
+  <!-- Splash overlay -->
+  <div class="splash-overlay" id="splashOverlay">
+    <div class="splash-content">
+      <div class="splash-img-outer">
+        <div class="splash-img-wrap">
+          <img class="splash-img" id="splashImg" src="" alt="">
+        </div>
+        <div class="splash-rings" id="splashRings">
+          <div class="splash-ring"></div>
+          <div class="splash-ring"></div>
+          <div class="splash-ring"></div>
+        </div>
+      </div>
+      <div class="splash-drink-name" id="splashDrinkName"></div>
+      <div class="splash-drink-price" id="splashDrinkPrice"></div>
+    </div>
+  </div>
+
+  <!-- Brew overlay (payment mini-game) -->
+  <div class="brew-overlay" id="brewOverlay">
+    <div class="brew-content">
+      <p class="brew-label">Extract your order</p>
+      <p class="brew-sub">Hit the sweet spot</p>
+      <div class="brew-bar-wrap">
+        <div class="brew-zone"></div>
+        <div class="brew-cursor" id="brewCursor"></div>
+      </div>
+      <button class="brew-btn" id="brewBtn">EXTRACT ☕</button>
+      <p class="brew-feedback" id="brewFeedback"></p>
+      <p class="brew-attempts" id="brewAttempts"></p>
+    </div>
+  </div>
+
+  <div class="cart" id="cart">
+    <button class="cart-close" id="cartClose">×</button>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <span class="cart-total">Total: <strong id="cartTotal">$0.00</strong></span>
+      <span class="cart-confirm" id="cartConfirm">Order placed!</span>
+      <button class="cart-order" id="cartOrder" disabled>Place Order</button>
+    </div>
+  </div>
+
+  <script>
+    var cart = {};
+
+    var cartEl      = document.getElementById('cart');
+    var cartItems   = document.getElementById('cartItems');
+    var cartTotal   = document.getElementById('cartTotal');
+    var cartOrder   = document.getElementById('cartOrder');
+    var cartConfirm = document.getElementById('cartConfirm');
+
+    // ── Splash elements ──
+    var splashOverlay   = document.getElementById('splashOverlay');
+    var splashImg       = document.getElementById('splashImg');
+    var splashDrinkName = document.getElementById('splashDrinkName');
+    var splashDrinkPrice= document.getElementById('splashDrinkPrice');
+    var splashRings     = document.getElementById('splashRings');
+
+    var drinkImages = {
+      'Coffee':         'images/drink-coffee.jpg',
+      'Espresso':       'images/drink-espresso.jpg',
+      'Macchiato':      'images/drink-macchiato.jpg',
+      'Cappuccino':     'images/drink-cappuccino.jpg',
+      'Latte':          'images/drink-latte.jpg',
+      'Matcha':         'images/drink-matcha.jpg',
+      'Chai Latte':     'images/drink-chai-latte.jpg',
+      'Tea':            'images/drink-tea.jpg',
+      'Hot Chocolate':  'images/drink-hot-chocolate.jpg',
+      'London Fog':     'images/drink-london-fog.jpg',
+      'Cold Brew':      'images/drink-cold-brew.jpg',
+      'Iced Latte':     'images/drink-iced-latte.jpg',
+      'Iced Americano': 'images/drink-iced-americano.jpg',
+      'Iced Chai Latte':'images/drink-iced-chai-latte.jpg',
+      'Iced Tea':       'images/drink-iced-tea.jpg'
+    };
+
+    var coldDrinks = { 'Cold Brew': true, 'Iced Latte': true, 'Iced Americano': true, 'Iced Chai Latte': true, 'Iced Tea': true };
+    var splashTimer = null;
+
+    function playDrinkSound(isCold) {
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        var ctx = new AC();
+        if (ctx.state === 'suspended') ctx.resume();
+        var now = ctx.currentTime;
+        var sr  = ctx.sampleRate;
+
+        if (isCold) {
+          // Ice clinks
+          [0, 0.13, 0.29].forEach(function(t) {
+            var o  = ctx.createOscillator();
+            var og = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(2000 + Math.random() * 1000, now + t);
+            o.frequency.exponentialRampToValueAtTime(380, now + t + 0.18);
+            og.gain.setValueAtTime(0.13, now + t);
+            og.gain.exponentialRampToValueAtTime(0.001, now + t + 0.18);
+            o.connect(og); og.connect(ctx.destination);
+            o.start(now + t); o.stop(now + t + 0.18);
+          });
+        }
+
+        var start    = isCold ? now + 0.28 : now;
+        var duration = 1.8;
+
+        // ── Main stream: bandpass noise sweeps downward as the cup fills ──
+        var pourBuf = ctx.createBuffer(1, Math.floor(sr * duration), sr);
+        var pd = pourBuf.getChannelData(0);
+        for (var i = 0; i < pd.length; i++) pd[i] = Math.random() * 2 - 1;
+
+        var pourSrc = ctx.createBufferSource();
+        pourSrc.buffer = pourBuf;
+
+        var bpf = ctx.createBiquadFilter();
+        bpf.type = 'bandpass';
+        bpf.frequency.setValueAtTime(isCold ? 1800 : 700, start);
+        bpf.frequency.exponentialRampToValueAtTime(isCold ? 480 : 140, start + duration);
+        bpf.Q.value = isCold ? 1.6 : 0.9;
+
+        var pourGain = ctx.createGain();
+        pourGain.gain.setValueAtTime(0, start);
+        pourGain.gain.linearRampToValueAtTime(0.38, start + 0.07);
+        pourGain.gain.setValueAtTime(0.38, start + duration * 0.62);
+        pourGain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+
+        pourSrc.connect(bpf); bpf.connect(pourGain); pourGain.connect(ctx.destination);
+        pourSrc.start(start); pourSrc.stop(start + duration);
+
+        // ── Splash burst: high-frequency hit when liquid first lands ──
+        var splashDur = 0.32;
+        var splashBuf = ctx.createBuffer(1, Math.floor(sr * splashDur), sr);
+        var sd = splashBuf.getChannelData(0);
+        for (var j = 0; j < sd.length; j++) sd[j] = Math.random() * 2 - 1;
+
+        var splashSrc = ctx.createBufferSource();
+        splashSrc.buffer = splashBuf;
+
+        var hpf = ctx.createBiquadFilter();
+        hpf.type = 'highpass';
+        hpf.frequency.value = isCold ? 2800 : 1400;
+
+        var splashGain = ctx.createGain();
+        splashGain.gain.setValueAtTime(0.16, start);
+        splashGain.gain.exponentialRampToValueAtTime(0.001, start + splashDur);
+
+        splashSrc.connect(hpf); hpf.connect(splashGain); splashGain.connect(ctx.destination);
+        splashSrc.start(start); splashSrc.stop(start + splashDur);
+
+      } catch (e) {}
+    }
+
+    function showSplash(drink, price) {
+      if (splashTimer) clearTimeout(splashTimer);
+
+      // Reset rings animation
+      splashRings.classList.remove('pop');
+      void splashRings.offsetWidth; // reflow to restart animation
+
+      splashImg.src        = drinkImages[drink] || '';
+      splashImg.alt        = drink;
+      splashDrinkName.textContent  = drink;
+      splashDrinkPrice.textContent = '$' + price.toFixed(2);
+
+      splashOverlay.classList.add('active');
+      splashRings.classList.add('pop');
+
+      playDrinkSound(!!coldDrinks[drink]);
+
+      splashTimer = setTimeout(dismissSplash, 1200);
+    }
+
+    function dismissSplash() {
+      if (splashTimer) { clearTimeout(splashTimer); splashTimer = null; }
+      splashOverlay.classList.remove('active');
+      if (Object.keys(cart).length > 0) cartEl.classList.add('open');
+    }
+
+    splashOverlay.addEventListener('click', dismissSplash);
+
+    document.querySelectorAll('button.map-area').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var drink = btn.dataset.drink;
+        var price = parseFloat(btn.dataset.price);
+        if (cart[drink]) {
+          cart[drink].qty++;
+        } else {
+          cart[drink] = { price: price, qty: 1 };
+        }
+        render();
+        showSplash(drink, price);
+      });
+    });
+
+    document.getElementById('cartClose').addEventListener('click', function() {
+      cartEl.classList.remove('open');
+    });
+
+    // Queue countdown — brew game opens when you reach the front
+    function confirmOrder() {
+      cartOrder.style.display = 'none';
+      cartConfirm.style.display = 'block';
+
+      var position = Math.floor(Math.random() * 4) + 3;
+      var interval = Math.round(10000 / position);
+      cartConfirm.textContent = 'You are #' + position + ' in line';
+
+      var timer = setInterval(function() {
+        position--;
+        if (position > 1) {
+          cartConfirm.textContent = 'You are #' + position + ' in line';
+        } else {
+          clearInterval(timer);
+          cartConfirm.textContent = "You're next — extract your shot!";
+          setTimeout(openBrew, 900);
+        }
+      }, interval);
+    }
+
+    cartOrder.addEventListener('click', confirmOrder);
+
+    // ── Brew mini-game (3 hits, escalating) ────────────────────────────────
+    var brewOverlay    = document.getElementById('brewOverlay');
+    var brewCursor     = document.getElementById('brewCursor');
+    var brewBtn        = document.getElementById('brewBtn');
+    var brewFeedback   = document.getElementById('brewFeedback');
+    var brewAttemptsEl = document.getElementById('brewAttempts');
+    var brewContent    = brewOverlay.querySelector('.brew-content');
+    var brewZoneEl     = brewOverlay.querySelector('.brew-zone');
+
+    var brewRafId      = null;
+    var brewStartTime  = null;
+    var brewPos        = 50;
+    var brewSpeed      = 1.2;
+    var brewHits       = 0;
+    var brewActive     = false;
+
+    var HITS_REQUIRED  = 3;
+    var ZONE_SIZES     = [28, 18, 10];   // % width per hit level
+    var ZONE_SPEEDS    = [1.2, 2.0, 3.1];
+
+    function openBrew() {
+      brewHits      = 0;
+      brewSpeed     = ZONE_SPEEDS[0];
+      brewActive    = true;
+      brewFeedback.textContent   = '';
+      brewFeedback.className     = 'brew-feedback';
+      brewAttemptsEl.textContent = '○ ○ ○';
+      brewBtn.disabled = false;
+      setBrewZone(0);
+      brewOverlay.classList.add('active');
+      brewStartTime = null;
+      brewRafId = requestAnimationFrame(brewAnimate);
+    }
+
+    function setBrewZone(hitIndex) {
+      var half = ZONE_SIZES[hitIndex] / 2;
+      brewZoneEl.style.left  = (50 - half) + '%';
+      brewZoneEl.style.width = ZONE_SIZES[hitIndex] + '%';
+    }
+
+    function brewAnimate(timestamp) {
+      if (!brewStartTime) brewStartTime = timestamp;
+      var elapsed = (timestamp - brewStartTime) / 1000;
+      brewPos = 50 + Math.sin(elapsed * brewSpeed) * 50;
+      brewCursor.style.left = brewPos + '%';
+      if (brewActive) brewRafId = requestAnimationFrame(brewAnimate);
+    }
+
+    function stopBrew() {
+      brewActive = false;
+      if (brewRafId) { cancelAnimationFrame(brewRafId); brewRafId = null; }
+    }
+
+    function closeBrew() {
+      brewOverlay.classList.remove('active');
+      stopBrew();
+    }
+
+    function brewAllDone() {
+      closeBrew();
+      cartConfirm.textContent = 'Order placed!';
+      setTimeout(function() {
+        cart = {};
+        render();
+        cartEl.classList.remove('open');
+        cartConfirm.style.display = 'none';
+        cartConfirm.textContent = '';
+        cartOrder.style.display = '';
+      }, 2000);
+    }
+
+    function brewHit() {
+      brewHits++;
+      var dots = '● '.repeat(brewHits) + '○ '.repeat(HITS_REQUIRED - brewHits);
+      brewAttemptsEl.textContent = dots.trim();
+
+      if (brewHits >= HITS_REQUIRED) {
+        stopBrew();
+        brewFeedback.textContent = 'Perfect extraction! ☕';
+        brewFeedback.className   = 'brew-feedback success';
+        brewBtn.disabled = true;
+        setTimeout(brewAllDone, 700);
+        return;
+      }
+
+      brewFeedback.textContent = 'Nice! ☕  Keep going...';
+      brewFeedback.className   = 'brew-feedback success';
+      brewSpeed    = ZONE_SPEEDS[brewHits];
+      brewStartTime = null;   // cursor restarts from centre
+      setBrewZone(brewHits);
+    }
+
+    function brewMiss() {
+      var half = ZONE_SIZES[brewHits] / 2;
+      brewFeedback.textContent = brewPos < (50 - half) ? 'Too weak — try again' : 'Too strong!';
+      brewFeedback.className   = 'brew-feedback fail';
+      brewContent.classList.remove('shake');
+      void brewContent.offsetWidth;
+      brewContent.classList.add('shake');
+    }
+
+    brewBtn.addEventListener('click', function() {
+      if (!brewActive) return;
+      var half = ZONE_SIZES[brewHits] / 2;
+      if (brewPos >= (50 - half) && brewPos <= (50 + half)) {
+        brewHit();
+      } else {
+        brewMiss();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (!brewOverlay.classList.contains('active')) return;
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        if (!brewBtn.disabled) brewBtn.click();
+      }
+    });
+
+    function getTotal() {
+      return Object.values(cart).reduce(function(sum, item) {
+        return sum + item.price * item.qty;
+      }, 0);
+    }
+
+    function render() {
+      cartItems.innerHTML = '';
+      Object.keys(cart).forEach(function(drink) {
+        var item = cart[drink];
+        var row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML =
+          '<span class="drink-name">' + drink + '</span>' +
+          '<span class="drink-price">$' + item.price.toFixed(2) + '</span>' +
+          '<div class="qty">' +
+            '<button class="minus">−</button>' +
+            '<span class="num">' + item.qty + '</span>' +
+            '<button class="plus">+</button>' +
+          '</div>';
+        row.querySelector('.plus').addEventListener('click', function() {
+          cart[drink].qty++;
+          render();
+        });
+        row.querySelector('.minus').addEventListener('click', function() {
+          cart[drink].qty--;
+          if (cart[drink].qty <= 0) delete cart[drink];
+          render();
+        });
+        cartItems.appendChild(row);
+      });
+      cartTotal.textContent = '$' + getTotal().toFixed(2);
+      cartOrder.disabled = getTotal() === 0;
+      if (Object.keys(cart).length === 0) cartEl.classList.remove('open');
+    }
+  </script>
+
+</body>
+</html>
